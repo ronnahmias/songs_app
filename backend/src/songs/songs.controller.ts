@@ -1,6 +1,7 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ISongResponse } from './interfaces/song.response.interface';
 
 @ApiTags('Songs Controller')
 @Controller({
@@ -12,8 +13,8 @@ export class SongsController {
 
   @ApiOperation({ summary: 'Get All Songs From DB With filters' })
   @Get()
-  async getSongs() {
-    return 'hello from songs controller!';
+  async getSongs(): Promise<ISongResponse[]> {
+    return this.songsService.getAllSongs();
   }
 
   @ApiOperation({ summary: 'Add New Song' })
