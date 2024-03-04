@@ -1,0 +1,1 @@
+- In terminal run: `docker-compose up`
