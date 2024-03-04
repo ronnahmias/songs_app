@@ -1,9 +1,6 @@
-export interface ISongResponse {
-  id: number;
-  name: string;
-  band: {
-    id: number;
-    name: string;
-  };
-  year: number;
+import { ISong } from './song.interface';
+
+export interface ISongList {
+  songs: ISong[];
+  total: number;
 }
