@@ -1,7 +1,15 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { SongsService } from './songs.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ISongList } from './interfaces/song.response.interface';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Songs Controller')
 @Controller({
@@ -24,8 +32,37 @@ export class SongsController {
   }
 
   @ApiOperation({ summary: 'Upload CSV file of songs' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'CSV file',
+    type: 'object',
+    schema: {
+      type: 'object',
+      properties: {
+        csv: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @Post('upload')
-  async uploadSongsCsv() {
-    return 'hello from songs controller!';
+  @UseInterceptors(
+    FileInterceptor('csv', {
+      fileFilter: (req, file, callback) => {
+        if (!file.originalname.match(/\.(csv)$/)) {
+          return callback(
+            new BadRequestException('Only CSV files are allowed!'),
+            false,
+          );
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  async uploadSongsCsv(@UploadedFile() file: Express.Multer.File) {
+    console.log('upload file');
+
+    this.songsService.addSongsByCSV(file);
   }
 }
