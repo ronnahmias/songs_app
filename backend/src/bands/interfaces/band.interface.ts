@@ -4,4 +4,6 @@ export interface IBand {
   id: number;
   name: string;
   songs: ISong[];
+
+  deletedAt?: Date;
 }

@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger, VersioningType } from '@nestjs/common';
+import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -21,7 +21,7 @@ async function bootstrap() {
 
   // Enable CORS
   app.enableCors();
-
+  app.useGlobalPipes(new ValidationPipe());
   // Start the application Port
   const port = process.env.PORT || 3333;
   await app.listen(port);

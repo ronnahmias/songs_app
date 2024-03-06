@@ -5,4 +5,6 @@ export interface ISong {
   name: string;
   band: IBand;
   year: number;
+
+  deletedAt?: Date;
 }

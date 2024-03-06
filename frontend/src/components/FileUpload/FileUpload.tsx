@@ -1,4 +1,4 @@
-import { Button, styled } from "@mui/material";
+import { Button, CircularProgress, styled } from "@mui/material";
 import React, { ChangeEvent } from "react";
 import UploadIcon from "@mui/icons-material/Upload";
 
@@ -16,11 +16,13 @@ const VisuallyHiddenInput = styled("input")({
 
 interface IFileUploadButtonProps {
   title: string;
+  isUploading?: boolean;
   handleFileChange?: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const FileUploadButton: React.FC<IFileUploadButtonProps> = ({
   title,
+  isUploading = false,
   handleFileChange,
 }) => {
   return (
@@ -33,8 +35,13 @@ const FileUploadButton: React.FC<IFileUploadButtonProps> = ({
         startIcon={<UploadIcon />}
       >
         {title}
-        <VisuallyHiddenInput type="file" onChange={handleFileChange} />
+        <VisuallyHiddenInput
+          type="file"
+          accept=".csv"
+          onChange={handleFileChange}
+        />
       </Button>
+      {isUploading && <CircularProgress color="primary" />}
     </React.Fragment>
   );
 };

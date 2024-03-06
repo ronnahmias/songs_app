@@ -9,6 +9,7 @@ const Layout: React.FC = () => {
       <Box
         sx={{
           py: 3,
+          mt: 10,
         }}
       >
         <Outlet />

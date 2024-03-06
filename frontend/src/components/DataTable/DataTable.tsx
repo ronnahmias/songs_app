@@ -7,18 +7,21 @@ import {
   TablePagination,
   TableFooter,
   TableContainer,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
-import { useNavigate, useLocation } from "react-router-dom";
 import { ITableHeaders } from "./TableHeaders.interface";
 import { ISong } from "../../interfaces/songs/song.interface";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 interface IDataTableProps {
   data: ISong[];
   totalRows: number;
   headers: Array<ITableHeaders>;
   onChange: (query: number) => void;
+  onClickDelete: (id: number) => void;
   page: number;
-  path?: string;
+  rowsPerPage?: number;
 }
 
 const DataTable: React.FC<IDataTableProps> = function DataTable({
@@ -26,27 +29,12 @@ const DataTable: React.FC<IDataTableProps> = function DataTable({
   headers,
   onChange,
   page,
-  path,
   totalRows,
+  rowsPerPage = 7,
+  onClickDelete,
 }) {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  let emptyRows = 0;
-  const rowsPerPage = 10;
-  const handleChangePage = (event: React.SyntheticEvent, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     onChange(newPage);
-  };
-
-  if (data && data.length > 0) {
-    emptyRows = rowsPerPage - data.length;
-  } else {
-    emptyRows = 10;
-  }
-
-  const handleclick = (row) => {
-    if (path) navigate(`${path}/${row.status}/${row.id}`);
-    else navigate(`${location.pathname}/${row.id}`, { state: { row } });
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -61,6 +49,8 @@ const DataTable: React.FC<IDataTableProps> = function DataTable({
     }
     return value;
   };
+
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length);
 
   return (
     <TableContainer
@@ -88,22 +78,36 @@ const DataTable: React.FC<IDataTableProps> = function DataTable({
                 {item.name}
               </TableCell>
             ))}
+            <TableCell
+              sx={{
+                fontWeight: 600,
+                color: "primary.main",
+                width: "10%",
+              }}
+            >
+              Options
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {data &&
             data.map((row) => (
-              <TableRow
-                key={row.id}
-                onClick={() => {
-                  handleclick(row);
-                }}
-              >
+              <TableRow key={row.id}>
                 {headers.map((header: ITableHeaders, i: number) => (
                   <TableCell key={i} align="left">
                     {getValueFromNestedProperty(row, header.table)}
                   </TableCell>
                 ))}
+                <TableCell>
+                  <Tooltip title="Delete">
+                    <IconButton
+                      aria-label="delete"
+                      onClick={() => onClickDelete(row.id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
               </TableRow>
             ))}
           {emptyRows > 0 && (

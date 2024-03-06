@@ -5,7 +5,6 @@ interface ISearchTextFieldProps {
   onSearchQueryChange: (query: string) => void;
   validateQuery?: (query: string) => boolean;
   placeholder?: string;
-  radius?: number;
 }
 
 export const SearchTextField = React.memo<ISearchTextFieldProps>(
@@ -13,7 +12,6 @@ export const SearchTextField = React.memo<ISearchTextFieldProps>(
     onSearchQueryChange,
     validateQuery,
     placeholder,
-    radius,
   }) {
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -28,7 +26,6 @@ export const SearchTextField = React.memo<ISearchTextFieldProps>(
         sx={{
           "& .MuiOutlinedInput-root": {
             background: "#ffffff",
-            borderRadius: radius || undefined,
           },
         }}
         variant="outlined"

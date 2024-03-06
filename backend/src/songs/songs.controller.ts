@@ -1,8 +1,13 @@
 import {
   BadRequestException,
+  Body,
   Controller,
+  Delete,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -10,6 +15,8 @@ import { SongsService } from './songs.service';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ISongList } from './interfaces/song.response.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { SongsQueryDto } from './dto/songs.query.dto';
+import { SongDto } from './dto/song.dto';
 
 @ApiTags('Songs Controller')
 @Controller({
@@ -21,14 +28,15 @@ export class SongsController {
 
   @ApiOperation({ summary: 'Get All Songs From DB With filters' })
   @Get()
-  async getSongs(): Promise<ISongList> {
-    return this.songsService.getAllSongs();
+  async getSongs(@Query() filters: SongsQueryDto): Promise<ISongList> {
+    return this.songsService.getAllSongs(filters);
   }
 
   @ApiOperation({ summary: 'Add New Song' })
   @Post()
-  async addNewSong() {
-    return 'hello from songs controller!';
+  async addNewSong(@Body() dto: SongDto) {
+    console.log('add new song', dto);
+    return await this.songsService.addNewSong(dto);
   }
 
   @ApiOperation({ summary: 'Upload CSV file of songs' })
@@ -62,7 +70,11 @@ export class SongsController {
   )
   async uploadSongsCsv(@UploadedFile() file: Express.Multer.File) {
     console.log('upload file');
+    await this.songsService.addSongsByCSV(file);
+  }
 
-    this.songsService.addSongsByCSV(file);
+  @Delete(':id')
+  async deleteSong(@Param('id', ParseIntPipe) id: number) {
+    return await this.songsService.deleteSong(id);
   }
 }

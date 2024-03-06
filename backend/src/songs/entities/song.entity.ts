@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ISong } from '../interfaces/song.interface';
 import { IBand } from 'src/bands/interfaces/band.interface';
 import { BandEntity } from '../../bands/entities/band.entity';
@@ -19,4 +25,7 @@ export class SongEntity implements ISong {
 
   @Column({ type: 'int', nullable: false })
   year: number;
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

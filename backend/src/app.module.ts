@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { SongsModule } from './songs/songs.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { BandsModule } from './bands/bands.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ConfigModule } from '@nestjs/config';
       autoLoadEntities: false,
     }),
     SongsModule,
+    BandsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

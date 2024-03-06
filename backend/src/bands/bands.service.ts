@@ -19,4 +19,16 @@ export class BandsService {
     band.name = name;
     return this.bandsRepository.save(band);
   }
+
+  async getBands(): Promise<BandEntity[]> {
+    return this.bandsRepository.find({
+      order: {
+        name: 'ASC',
+      },
+    });
+  }
+
+  async deleteBand(id: number): Promise<void> {
+    this.bandsRepository.softDelete(id);
+  }
 }

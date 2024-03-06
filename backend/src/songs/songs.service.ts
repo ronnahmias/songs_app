@@ -4,6 +4,12 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ISongList } from './interfaces/song.response.interface';
 import { BandsService } from 'src/bands/bands.service';
+import { SongsQueryDto } from './dto/songs.query.dto';
+import {
+  PAGINATION_SKIP_DEFAULT,
+  PAGINATION_TAKE_DEFAULT,
+} from 'src/common/constants';
+import { SongDto } from './dto/song.dto';
 
 @Injectable()
 export class SongsService {
@@ -13,13 +19,38 @@ export class SongsService {
     private BandService: BandsService,
   ) {}
 
-  async getAllSongs(): Promise<ISongList> {
-    const [data, number] = await this.songsRepository.findAndCount({
-      relations: {
-        band: true,
-      },
-    });
+  async getAllSongs(filters: SongsQueryDto): Promise<ISongList> {
+    const Query = await this.songsRepository
+      .createQueryBuilder('song')
+      .leftJoinAndSelect('song.band', 'band')
+      .orderBy('song.id', 'DESC')
+      .take(filters.take || PAGINATION_TAKE_DEFAULT)
+      .skip((filters.skip || PAGINATION_SKIP_DEFAULT) * filters.take);
 
+    if (filters.minYear && filters.maxYear) {
+      Query.andWhere('song.year >= :minYear AND song.year <= :maxYear', {
+        minYear: filters.minYear,
+        maxYear: filters.maxYear,
+      });
+    }
+
+    if (filters.bands) {
+      Query.andWhere('song.band IN (:...bands)', {
+        bands: filters.bands,
+      });
+    }
+
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      Query.andWhere(
+        'LOWER(song.name) LIKE :search OR LOWER(band.name) LIKE :search',
+        {
+          search: `%${searchTerm}%`,
+        },
+      );
+    }
+
+    const [data, number] = await Query.getManyAndCount();
     return {
       songs: data,
       total: number,
@@ -52,6 +83,22 @@ export class SongsService {
       console.log('All songs added successfully');
     } else {
       throw new BadRequestException('An error occurred while parsing the CSV');
+    }
+  }
+
+  async addNewSong(songDto: SongDto): Promise<void> {
+    try {
+      let band = await this.BandService.getBandByName(songDto.band);
+      if (!band) {
+        band = await this.BandService.addBand(songDto.band);
+      }
+      const song = new SongEntity();
+      song.name = songDto.name;
+      song.band = band;
+      song.year = songDto.year;
+      await this.addUpdateSong(song);
+    } catch (error) {
+      throw new BadRequestException('An error occurred while adding the song');
     }
   }
 
@@ -110,6 +157,33 @@ export class SongsService {
     } catch (error) {
       console.error(`An error occurred: ${error.message}`);
       throw new BadRequestException('An error occurred while parsing the CSV');
+    }
+  }
+
+  async deleteSong(id: number) {
+    try {
+      // try to find the song
+      const song = await this.songsRepository.findOne({
+        where: { id },
+        relations: { band: true },
+      });
+      if (!song) {
+        throw new BadRequestException('Song not found');
+      }
+      await this.songsRepository.softDelete(id);
+
+      // check if the band has more songs if not we delete the band also
+      const songsLeft = await this.songsRepository.count({
+        where: { band: song.band },
+      });
+
+      if (songsLeft === 0) {
+        await this.BandService.deleteBand(song.band.id);
+      }
+    } catch (error) {
+      throw new BadRequestException(
+        'An error occurred while deleting the song with id: ' + id,
+      );
     }
   }
 }

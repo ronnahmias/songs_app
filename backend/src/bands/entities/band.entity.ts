@@ -1,4 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { IBand } from '../interfaces/band.interface';
 import { ISong } from 'src/songs/interfaces/song.interface';
 import { SongEntity } from '../../songs/entities/song.entity';
@@ -18,4 +24,7 @@ export class BandEntity implements IBand {
     cascade: true,
   })
   songs: ISong[];
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }
