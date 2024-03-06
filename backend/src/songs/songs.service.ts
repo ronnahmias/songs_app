@@ -23,7 +23,7 @@ export class SongsService {
     const Query = await this.songsRepository
       .createQueryBuilder('song')
       .leftJoinAndSelect('song.band', 'band')
-      .orderBy('song.id', 'DESC')
+      .orderBy('band.name', 'ASC')
       .take(filters.take || PAGINATION_TAKE_DEFAULT)
       .skip((filters.skip || PAGINATION_SKIP_DEFAULT) * filters.take);
 
@@ -59,21 +59,22 @@ export class SongsService {
 
   async addSongsByCSV(file: Express.Multer.File) {
     const songsFileData = await this.parseCSV(file);
+
     if (songsFileData.length > 1) {
       for (let i = 0; i < songsFileData.length; i++) {
         const songRow = songsFileData[i];
 
         // band add
         try {
-          let band = await this.BandService.getBandByName(songRow.Band);
+          let band = await this.BandService.getBandByName(songRow.band);
           if (!band) {
-            band = await this.BandService.addBand(songRow.Band);
+            band = await this.BandService.addBand(songRow.band);
           }
 
           // song add
           const songEntity = new SongEntity();
-          songEntity.name = songRow['Song Name'];
-          songEntity.year = parseInt(songRow.Year);
+          songEntity.name = songRow['song name'];
+          songEntity.year = parseInt(songRow.year);
           songEntity.band = band;
           await this.addUpdateSong(songEntity);
         } catch (error) {
@@ -90,12 +91,14 @@ export class SongsService {
 
   async addNewSong(songDto: SongDto): Promise<void> {
     try {
-      let band = await this.BandService.getBandByName(songDto.band);
+      let band = await this.BandService.getBandByName(
+        songDto.band.toLowerCase(),
+      );
       if (!band) {
-        band = await this.BandService.addBand(songDto.band);
+        band = await this.BandService.addBand(songDto.band.toLowerCase());
       }
       const song = new SongEntity();
-      song.name = songDto.name;
+      song.name = songDto.name.toLowerCase();
       song.band = band;
       song.year = songDto.year;
       await this.addUpdateSong(song);
@@ -136,7 +139,7 @@ export class SongsService {
 
   async parseCSV(file: Express.Multer.File): Promise<any[]> {
     try {
-      const fileStr = file.buffer.toString('utf8');
+      const fileStr = file.buffer.toString('utf8').toLowerCase();
       const delimiter = ';';
       const lines = fileStr.split('\n');
       const result = [];
