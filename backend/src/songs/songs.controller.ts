@@ -69,7 +69,6 @@ export class SongsController {
     }),
   )
   async uploadSongsCsv(@UploadedFile() file: Express.Multer.File) {
-    console.log('upload file');
     await this.songsService.addSongsByCSV(file);
   }
 

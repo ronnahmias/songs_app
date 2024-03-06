@@ -33,6 +33,7 @@ const FileUploadButton: React.FC<IFileUploadButtonProps> = ({
         variant="contained"
         tabIndex={-1}
         startIcon={<UploadIcon />}
+        sx={{ display: isUploading ? "none" : "flex" }}
       >
         {title}
         <VisuallyHiddenInput

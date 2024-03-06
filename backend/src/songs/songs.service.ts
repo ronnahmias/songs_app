@@ -78,9 +78,11 @@ export class SongsService {
           await this.addUpdateSong(songEntity);
         } catch (error) {
           console.log(error);
+          throw new BadRequestException(
+            'An error occurred while adding the songs from the CSV file',
+          );
         }
       }
-      console.log('All songs added successfully');
     } else {
       throw new BadRequestException('An error occurred while parsing the CSV');
     }

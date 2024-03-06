@@ -128,17 +128,6 @@ const DataTable: React.FC<IDataTableProps> = function DataTable({
               onPageChange={handleChangePage}
               align="center"
               sx={{ borderBottom: 0 }}
-              labelDisplayedRows={({ page }) => {
-                return `${
-                  page === 0
-                    ? data.length < 10
-                      ? data.length
-                      : 10
-                    : 10 * (page + 1) > totalRows
-                    ? totalRows
-                    : 10 * (page + 1)
-                }/${totalRows}`;
-              }}
               showFirstButton={true}
               showLastButton={true}
             />
