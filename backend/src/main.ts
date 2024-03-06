@@ -23,7 +23,7 @@ async function bootstrap() {
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   // Start the application Port
-  const port = process.env.PORT || 3333;
+  const port = process.env.PORT || 3000;
   await app.listen(port);
 
   Logger.log(`🚀 Application is running on: http://localhost:${port}`);
