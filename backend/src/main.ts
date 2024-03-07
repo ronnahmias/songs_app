@@ -11,19 +11,22 @@ async function bootstrap() {
   });
 
   // Swagger Api Documentation
-  const config = new DocumentBuilder().setTitle('Songs App RestAPI').build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
-  });
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder().setTitle('Songs App RestAPI').build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    });
+  }
 
   // Enable CORS
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
+
   // Start the application Port
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 3333;
   await app.listen(port);
 
   Logger.log(`🚀 Application is running on: http://localhost:${port}`);

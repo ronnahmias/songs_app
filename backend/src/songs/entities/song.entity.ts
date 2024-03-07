@@ -26,6 +26,9 @@ export class SongEntity implements ISong {
   @Column({ type: 'int', nullable: false })
   year: number;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  ytVideoId: string;
+
   @DeleteDateColumn()
   deletedAt?: Date;
 }

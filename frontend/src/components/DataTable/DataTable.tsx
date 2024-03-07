@@ -13,6 +13,8 @@ import {
 import { ITableHeaders } from "./TableHeaders.interface";
 import { ISong } from "../../interfaces/songs/song.interface";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { YouTube } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 
 interface IDataTableProps {
   data: ISong[];
@@ -98,7 +100,24 @@ const DataTable: React.FC<IDataTableProps> = function DataTable({
                     {getValueFromNestedProperty(row, header.table)}
                   </TableCell>
                 ))}
-                <TableCell>
+                <TableCell
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  {!row.ytVideoId ? null : (
+                    <Tooltip title="Listen on Youtube">
+                      <Link
+                        to={`https://www.youtube.com/watch?v=${row.ytVideoId}`}
+                        target="_blank"
+                      >
+                        <IconButton aria-label="youtube">
+                          <YouTube />
+                        </IconButton>
+                      </Link>
+                    </Tooltip>
+                  )}
                   <Tooltip title="Delete">
                     <IconButton
                       aria-label="delete"

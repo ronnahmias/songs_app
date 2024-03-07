@@ -5,6 +5,6 @@ export interface ISong {
   name: string;
   band: IBand;
   year: number;
-
+  ytVideoId: string;
   deletedAt?: Date;
 }

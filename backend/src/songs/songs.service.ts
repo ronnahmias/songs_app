@@ -10,6 +10,7 @@ import {
   PAGINATION_TAKE_DEFAULT,
 } from 'src/common/constants';
 import { SongDto } from './dto/song.dto';
+import * as yts from 'yt-search';
 
 @Injectable()
 export class SongsService {
@@ -20,12 +21,20 @@ export class SongsService {
   ) {}
 
   async getAllSongs(filters: SongsQueryDto): Promise<ISongList> {
+    // take and skip are optional, if not provided we use the default values get is passed as a string
+    const take = parseInt(filters.take, 10)
+      ? parseInt(filters.take, 10)
+      : PAGINATION_TAKE_DEFAULT;
+    const skip = parseInt(filters.skip, 10)
+      ? parseInt(filters.skip, 10)
+      : PAGINATION_SKIP_DEFAULT;
+
     const Query = await this.songsRepository
       .createQueryBuilder('song')
       .leftJoinAndSelect('song.band', 'band')
       .orderBy('band.name', 'ASC')
-      .take(filters.take || PAGINATION_TAKE_DEFAULT)
-      .skip((filters.skip || PAGINATION_SKIP_DEFAULT) * filters.take);
+      .take(take)
+      .skip(skip * take);
 
     if (filters.minYear && filters.maxYear) {
       Query.andWhere('song.year >= :minYear AND song.year <= :maxYear', {
@@ -76,6 +85,10 @@ export class SongsService {
           songEntity.name = songRow['song name'];
           songEntity.year = parseInt(songRow.year);
           songEntity.band = band;
+          songEntity.ytVideoId = await this.searchSongYT(
+            songEntity.name,
+            songRow.band,
+          );
           await this.addUpdateSong(songEntity);
         } catch (error) {
           console.log(error);
@@ -86,6 +99,17 @@ export class SongsService {
       }
     } else {
       throw new BadRequestException('An error occurred while parsing the CSV');
+    }
+  }
+
+  // search for a song on youtube and return the video id
+  async searchSongYT(songName: string, bandName: string): Promise<string> {
+    try {
+      const r = await yts.search(songName + ' ' + bandName);
+      return r?.videos[0]?.videoId;
+    } catch (error) {
+      console.log(error);
+      return '';
     }
   }
 
@@ -101,6 +125,7 @@ export class SongsService {
       song.name = songDto.name.toLowerCase();
       song.band = band;
       song.year = songDto.year;
+      song.ytVideoId = await this.searchSongYT(song.name, song.band.name);
       await this.addUpdateSong(song);
     } catch (error) {
       throw new BadRequestException('An error occurred while adding the song');

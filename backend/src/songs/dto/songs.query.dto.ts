@@ -6,12 +6,12 @@ export class SongsQueryDto implements ISongsQuery {
   @ApiProperty({ required: false, type: Number })
   @IsOptional()
   @IsNumberString()
-  take?: number;
+  take?: string;
 
   @ApiProperty({ required: false, type: Number })
   @IsOptional()
   @IsNumberString()
-  skip?: number;
+  skip?: string;
 
   @ApiProperty({ required: false, type: String })
   @IsOptional()
@@ -21,12 +21,12 @@ export class SongsQueryDto implements ISongsQuery {
   @ApiProperty({ required: false, type: Number })
   @IsOptional()
   @IsNumberString()
-  minYear?: number;
+  minYear?: string;
 
   @ApiProperty({ required: false, type: Number })
   @IsOptional()
   @IsNumberString()
-  maxYear?: number;
+  maxYear?: string;
 
   @ApiProperty({ required: false, type: [Number] })
   @IsOptional()

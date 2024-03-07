@@ -1,8 +1,8 @@
 export interface ISongsQuery {
-  take?: number;
-  skip?: number;
+  take?: string;
+  skip?: string;
   search?: string;
-  minYear?: number;
-  maxYear?: number;
+  minYear?: string;
+  maxYear?: string;
   bands?: number[];
 }

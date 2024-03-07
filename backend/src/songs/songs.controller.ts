@@ -35,7 +35,6 @@ export class SongsController {
   @ApiOperation({ summary: 'Add New Song' })
   @Post()
   async addNewSong(@Body() dto: SongDto) {
-    console.log('add new song', dto);
     return await this.songsService.addNewSong(dto);
   }
 

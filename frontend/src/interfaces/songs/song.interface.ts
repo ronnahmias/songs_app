@@ -5,6 +5,7 @@ export interface ISong {
   name: string;
   band: IBand;
   year: number;
+  ytVideoId: string;
 }
 
 export interface ISongList {
