@@ -35,5 +35,5 @@ DB_HOST=host.docker.internal <br />
 DB_PORT=5432 <br />
 DB_USERNAME=postgres <br />
 PORT=3333 <br />
-VITE_API_BASE_URL=http://localhost:3333/
+VITE_API_BASE_URL=http://localhost:3333/ <br />
 NODE_ENV=development
